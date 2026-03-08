@@ -186,6 +186,8 @@ curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 $response = curl_exec($ch);
 curl_close($ch);
 
+error_log("DEBUG: PM creation response = " . substr($response, 0, 300));
+
 $json = json_decode($response, true);
 if (!$json || !isset($json['id'])) {
     $msg = $json['error']['message'] ?? 'PM creation failed';
