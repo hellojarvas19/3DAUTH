@@ -189,6 +189,10 @@ curl_close($ch);
 $json = json_decode($response, true);
 if (!$json || !isset($json['id'])) {
     $msg = $json['error']['message'] ?? 'PM creation failed';
+    $decline_code = $json['error']['decline_code'] ?? $json['error']['code'] ?? null;
+    if ($decline_code) {
+        $msg = strtoupper($decline_code) . ' » ' . $msg;
+    }
     echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
@@ -234,6 +238,10 @@ if (strpos($response, 'insufficient_funds')) {
 
 if (isset($json['error'])) {
     $msg = $json['error']['message'] ?? 'Confirm failed';
+    $decline_code = $json['error']['decline_code'] ?? $json['error']['code'] ?? null;
+    if ($decline_code) {
+        $msg = strtoupper($decline_code) . ' » ' . $msg;
+    }
     echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
@@ -245,6 +253,10 @@ $secret = $json['payment_intent']['client_secret'] ?? null;
 
 if (!$payatt || !$servertrans) {
     $msg = $json['payment_intent']['last_payment_error']['message'] ?? 'Payment failed';
+    $decline_code = $json['payment_intent']['last_payment_error']['decline_code'] ?? $json['payment_intent']['last_payment_error']['code'] ?? null;
+    if ($decline_code) {
+        $msg = strtoupper($decline_code) . ' » ' . $msg;
+    }
     echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
