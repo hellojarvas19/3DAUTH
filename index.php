@@ -265,7 +265,7 @@ $secret = $json['payment_intent']['client_secret'] ?? null;
 
 // Check if it's a CAPTCHA/verification challenge instead of 3DS
 if ($challenge_type == 'intent_confirmation_challenge') {
-    echo json_encode(['status' => 'dead', 'msg' => 'VERIFICATION_REQUIRED » Merchant requires additional verification', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+    echo json_encode(['status' => 'dead', 'msg' => 'CAPTCHA REQUIRED', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
 
