@@ -1,5 +1,5 @@
 {
-  "name": "stripe-autohitter-api",
+  "name": "stripe/autohitter-api",
   "description": "Stripe Checkout 3DS Autohitter API",
   "version": "1.0.0",
   "require": {
