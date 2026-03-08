@@ -263,6 +263,10 @@ if (isset($json['error'])) {
 if (!isset($json['payment_intent']) || empty($json['payment_intent'])) {
     error_log("DEBUG: No payment_intent. Full response keys: " . json_encode(array_keys($json)));
     error_log("DEBUG: next_action: " . json_encode($json['next_action'] ?? null));
+    error_log("DEBUG: payment_intent value: " . json_encode($json['payment_intent'] ?? 'not set'));
+    error_log("DEBUG: status: " . ($json['status'] ?? 'not set'));
+    error_log("DEBUG: state: " . ($json['state'] ?? 'not set'));
+    error_log("DEBUG: site_key: " . ($json['site_key'] ?? 'not set'));
     
     // No payment_intent - check session status
     $session_status = $json['status'] ?? 'unknown';
@@ -280,6 +284,12 @@ if (!isset($json['payment_intent']) || empty($json['payment_intent'])) {
             echo json_encode(['status' => 'dead', 'msg' => 'CAPTCHA REQUIRED', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
             exit;
         }
+    }
+    
+    // Check for site_key (CAPTCHA indicator)
+    if (!empty($json['site_key'])) {
+        echo json_encode(['status' => 'dead', 'msg' => 'CAPTCHA REQUIRED', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+        exit;
     }
     
     echo json_encode(['status' => 'dead', 'msg' => 'DECLINED » Session expired or invalid', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
