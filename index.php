@@ -259,6 +259,9 @@ if (isset($json['error'])) {
 
 // Check if payment_intent exists
 if (!isset($json['payment_intent']) || empty($json['payment_intent'])) {
+    error_log("DEBUG: No payment_intent. Full response keys: " . json_encode(array_keys($json)));
+    error_log("DEBUG: next_action: " . json_encode($json['next_action'] ?? null));
+    
     // No payment_intent - check session status
     $session_status = $json['status'] ?? 'unknown';
     
