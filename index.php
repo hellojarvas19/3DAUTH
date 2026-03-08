@@ -66,12 +66,22 @@ try {
     
     if (!$pk_live) {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'msg' => 'Could not extract PK from URL', 'debug' => ['hash_length' => strlen($hash_part), 'decoded_length' => strlen($decoded)]]);
+        echo json_encode([
+            'status' => 'error', 
+            'msg' => 'Could not extract PK from URL', 
+            'debug' => [
+                'hash_length' => strlen($hash_part), 
+                'decoded_length' => strlen($decoded),
+                'xor_decoded_preview' => substr($xor_decoded, 0, 100),
+                'json_error' => json_last_error_msg(),
+                'data_keys' => $data ? array_keys($data) : null
+            ]
+        ]);
         exit;
     }
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'msg' => 'Failed to decode URL']);
+    echo json_encode(['status' => 'error', 'msg' => 'Failed to decode URL', 'exception' => $e->getMessage()]);
     exit;
 }
 
