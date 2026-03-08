@@ -259,8 +259,15 @@ if (isset($json['error'])) {
 
 $payatt = $json['payment_intent']['next_action']['use_stripe_sdk']['three_d_secure_2_source'] ?? null;
 $servertrans = $json['payment_intent']['next_action']['use_stripe_sdk']['server_transaction_id'] ?? null;
+$challenge_type = $json['payment_intent']['next_action']['use_stripe_sdk']['type'] ?? null;
 $pi = $json['payment_intent']['id'] ?? null;
 $secret = $json['payment_intent']['client_secret'] ?? null;
+
+// Check if it's a CAPTCHA/verification challenge instead of 3DS
+if ($challenge_type == 'intent_confirmation_challenge') {
+    echo json_encode(['status' => 'dead', 'msg' => 'VERIFICATION_REQUIRED » Merchant requires additional verification', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+    exit;
+}
 
 if (!$payatt || !$servertrans) {
     // Debug: log the payment_intent structure
