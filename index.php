@@ -62,21 +62,11 @@ try {
         $xor_decoded .= chr(ord($decoded[$i]) ^ 5);
     }
     $data = json_decode($xor_decoded, true);
-    $pk_live = $data['publishableKey'] ?? null;
+    $pk_live = $data['publishableKey'] ?? $data['apiKey'] ?? null;
     
     if (!$pk_live) {
         http_response_code(400);
-        echo json_encode([
-            'status' => 'error', 
-            'msg' => 'Could not extract PK from URL', 
-            'debug' => [
-                'hash_length' => strlen($hash_part), 
-                'decoded_length' => strlen($decoded),
-                'xor_decoded_preview' => substr($xor_decoded, 0, 100),
-                'json_error' => json_last_error_msg(),
-                'data_keys' => $data ? array_keys($data) : null
-            ]
-        ]);
+        echo json_encode(['status' => 'error', 'msg' => 'Could not extract PK from URL']);
         exit;
     }
 } catch (Exception $e) {
