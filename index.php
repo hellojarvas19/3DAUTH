@@ -261,15 +261,24 @@ $pi = $json['payment_intent']['id'] ?? null;
 $secret = $json['payment_intent']['client_secret'] ?? null;
 
 if (!$payatt || !$servertrans) {
-    $msg = $json['payment_intent']['last_payment_error']['message'] ?? null;
-    $decline_code = $json['payment_intent']['last_payment_error']['decline_code'] ?? $json['payment_intent']['last_payment_error']['code'] ?? null;
+    // Check if payment_intent has status that indicates decline
+    $pi_status = $json['payment_intent']['status'] ?? null;
     
-    if (!$msg && !$decline_code) {
-        $msg = 'Card Declined - No 3DS data received';
-    } elseif ($decline_code) {
-        $msg = strtoupper($decline_code) . ' » ' . ($msg ?: 'Card Declined');
+    if ($pi_status == 'requires_payment_method') {
+        // Card was declined
+        $msg = $json['payment_intent']['last_payment_error']['message'] ?? 'Card Declined';
+        $decline_code = $json['payment_intent']['last_payment_error']['decline_code'] ?? $json['payment_intent']['last_payment_error']['code'] ?? null;
+        
+        if ($decline_code) {
+            $msg = strtoupper($decline_code) . ' » ' . $msg;
+        }
+        
+        echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+        exit;
     }
     
+    // No 3DS data and no clear decline
+    $msg = 'Card Declined - No 3DS data received';
     echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
