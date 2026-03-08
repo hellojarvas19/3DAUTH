@@ -327,10 +327,12 @@ if (strpos($result, 'insufficient_funds')) {
     exit;
 }
 
-$msg = $extract['last_payment_error']['message'] ?? $extract['error']['message'] ?? 'Payment Failed';
-$decline_code = $extract['last_payment_error']['decline_code'] ?? $extract['error']['decline_code'] ?? null;
+$last_error = $extract['last_payment_error'] ?? [];
+$error = $extract['error'] ?? [];
+$msg = $last_error['message'] ?? $error['message'] ?? 'Payment Failed';
+$decline_code = $last_error['decline_code'] ?? $error['decline_code'] ?? $last_error['code'] ?? $error['code'] ?? null;
 if ($decline_code) {
-    $msg = strtoupper($decline_code) . ': ' . $msg;
+    $msg = strtoupper($decline_code) . ' - ' . $msg;
 }
 echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
 ?>
