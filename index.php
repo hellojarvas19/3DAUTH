@@ -223,6 +223,8 @@ curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 $response = curl_exec($ch);
 curl_close($ch);
 
+error_log("DEBUG: Confirm response = " . substr($response, 0, 500));
+
 $json = json_decode($response, true);
 $status = $json['status'] ?? null;
 
