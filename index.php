@@ -238,10 +238,19 @@ if (strpos($response, 'insufficient_funds')) {
 
 if (isset($json['error'])) {
     $msg = $json['error']['message'] ?? 'Confirm failed';
-    $decline_code = $json['error']['decline_code'] ?? $json['error']['code'] ?? null;
+    $decline_code = $json['error']['decline_code'] ?? null;
+    $code = $json['error']['code'] ?? null;
+    $type = $json['error']['type'] ?? null;
+    
+    // Build error prefix
     if ($decline_code) {
         $msg = strtoupper($decline_code) . ' » ' . $msg;
+    } elseif ($code) {
+        $msg = strtoupper($code) . ' » ' . $msg;
+    } elseif ($type && $type !== 'invalid_request_error') {
+        $msg = strtoupper(str_replace('_', ' ', $type)) . ' » ' . $msg;
     }
+    
     echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
