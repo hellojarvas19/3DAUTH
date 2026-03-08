@@ -257,6 +257,20 @@ if (isset($json['error'])) {
     exit;
 }
 
+// Check if payment_intent exists
+if (!isset($json['payment_intent']) || empty($json['payment_intent'])) {
+    // No payment_intent - check session status
+    $session_status = $json['status'] ?? 'unknown';
+    
+    if ($session_status == 'complete') {
+        echo json_encode(['status' => 'charge', 'msg' => 'Payment Successful', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+        exit;
+    }
+    
+    echo json_encode(['status' => 'dead', 'msg' => 'DECLINED » Session expired or invalid', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+    exit;
+}
+
 $payatt = $json['payment_intent']['next_action']['use_stripe_sdk']['three_d_secure_2_source'] ?? null;
 $servertrans = $json['payment_intent']['next_action']['use_stripe_sdk']['server_transaction_id'] ?? null;
 $challenge_type = $json['payment_intent']['next_action']['use_stripe_sdk']['type'] ?? null;
