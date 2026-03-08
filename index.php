@@ -319,10 +319,18 @@ if ($status == 'succeeded') {
 
 if (strpos($result, 'insufficient_funds')) {
     $msg = $extract['last_payment_error']['message'] ?? 'Insufficient Funds';
+    $decline_code = $extract['last_payment_error']['decline_code'] ?? null;
+    if ($decline_code) {
+        $msg = strtoupper($decline_code) . ': ' . $msg;
+    }
     echo json_encode(['status' => 'live', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
 
 $msg = $extract['last_payment_error']['message'] ?? $extract['error']['message'] ?? 'Payment Failed';
+$decline_code = $extract['last_payment_error']['decline_code'] ?? $extract['error']['decline_code'] ?? null;
+if ($decline_code) {
+    $msg = strtoupper($decline_code) . ': ' . $msg;
+}
 echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
 ?>
