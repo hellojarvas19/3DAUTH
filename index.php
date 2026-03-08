@@ -261,6 +261,9 @@ $pi = $json['payment_intent']['id'] ?? null;
 $secret = $json['payment_intent']['client_secret'] ?? null;
 
 if (!$payatt || !$servertrans) {
+    // Debug: log the payment_intent structure
+    error_log("DEBUG: payment_intent = " . json_encode($json['payment_intent'] ?? []));
+    
     // Check if payment_intent has status that indicates decline
     $pi_status = $json['payment_intent']['status'] ?? null;
     
