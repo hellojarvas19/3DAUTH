@@ -44,12 +44,19 @@ if (!strpos($checkout_url, '#')) {
 }
 
 $hash_part = explode('#', $checkout_url)[1];
+$hash_part = urldecode($hash_part);
 if (strpos($hash_part, '%%%')) {
     $hash_part = explode('%%%', $hash_part)[0];
 }
 
 try {
     $decoded = base64_decode($hash_part);
+    if ($decoded === false) {
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'msg' => 'Failed to decode hash']);
+        exit;
+    }
+    
     $xor_decoded = '';
     for ($i = 0; $i < strlen($decoded); $i++) {
         $xor_decoded .= chr(ord($decoded[$i]) ^ 5);
@@ -59,7 +66,7 @@ try {
     
     if (!$pk_live) {
         http_response_code(400);
-        echo json_encode(['status' => 'error', 'msg' => 'Could not extract PK from URL']);
+        echo json_encode(['status' => 'error', 'msg' => 'Could not extract PK from URL', 'debug' => ['hash_length' => strlen($hash_part), 'decoded_length' => strlen($decoded)]]);
         exit;
     }
 } catch (Exception $e) {
