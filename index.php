@@ -329,21 +329,10 @@ if (strpos($result, 'insufficient_funds')) {
 
 $msg = $extract['last_payment_error']['message'] ?? $extract['error']['message'] ?? 'Payment Failed';
 $decline_code = $extract['last_payment_error']['decline_code'] ?? $extract['error']['decline_code'] ?? null;
+$code = $extract['last_payment_error']['code'] ?? $extract['error']['code'] ?? null;
 
-// Debug mode
-if (isset($_GET['debug'])) {
-    echo json_encode([
-        'status' => 'debug',
-        'msg' => $msg,
-        'decline_code' => $decline_code,
-        'last_payment_error' => $extract['last_payment_error'] ?? null,
-        'error' => $extract['error'] ?? null
-    ]);
-    exit;
-}
-
-if ($decline_code) {
-    $msg = strtoupper($decline_code) . ': ' . $msg;
+if ($decline_code || $code) {
+    $msg = ($decline_code ? strtoupper($decline_code) : '') . ($code ? ' : ' . strtoupper($code) : '') . ' » ' . $msg;
 }
 echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
 ?>
