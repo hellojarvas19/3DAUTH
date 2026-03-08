@@ -267,6 +267,16 @@ if (!isset($json['payment_intent']) || empty($json['payment_intent'])) {
         exit;
     }
     
+    // Check if there's a next_action at session level (for CAPTCHA)
+    $next_action_type = $json['next_action']['type'] ?? null;
+    if ($next_action_type == 'use_stripe_sdk') {
+        $sdk_type = $json['next_action']['use_stripe_sdk']['type'] ?? null;
+        if ($sdk_type == 'intent_confirmation_challenge') {
+            echo json_encode(['status' => 'dead', 'msg' => 'CAPTCHA REQUIRED', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
+            exit;
+        }
+    }
+    
     echo json_encode(['status' => 'dead', 'msg' => 'DECLINED » Session expired or invalid', 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
     exit;
 }
