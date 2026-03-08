@@ -334,4 +334,3 @@ if ($decline_code) {
 }
 echo json_encode(['status' => 'dead', 'msg' => $msg, 'merchant' => $merchant, 'price' => $price_str, 'product' => $items]);
 ?>
-// Updated Sun Mar  8 07:56:46 AM UTC 2026
